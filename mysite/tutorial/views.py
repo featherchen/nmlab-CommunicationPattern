@@ -4,6 +4,13 @@ from rest_framework.response import Response
 from rest_framework import permissions
 from google.protobuf.json_format import MessageToJson, MessageToDict
 
+import time
+import argparse
+
+import psutil
+import paho.mqtt.client as mqtt
+
+# import threading
 # Create your views here.
 class EchoView1(APIView):
     permission_classes = (permissions.AllowAny,)
@@ -20,6 +27,12 @@ class EchoView2(APIView):
 class Fibonacci(APIView):
     permission_classes = (permissions.AllowAny,)
 
+    def __init__(self):
+        self.client = mqtt.Client()
+        self.client.connect(host="localhost", port=1883)
+        self.client.loop_start()
+        pass
+
     def post(self, request):
         import os
         import os.path as osp
@@ -35,6 +48,7 @@ class Fibonacci(APIView):
         import fib_pb2_grpc
 
         order=int(request.data["order"])
+        self.client.publish(topic="LOG", payload=order)
         # host = f"{args['ip']}:{args['port']}"
         # print(host)
         host = "localhost:8080"
@@ -47,12 +61,35 @@ class Fibonacci(APIView):
             response = stub.Compute(req)
             # print(response.value)
 
-        return Response(data={ 'echo': response.value }, status=200)
+        return Response(data={ 'Fibonacci': response.value }, status=200)
 
 
+# def on_message(client, obj, msg):
+#     global History
+#     # print(f"TOPIC:{msg.topic}, VALUE:{msg.payload}")
+#     # print(msg.payload)
+#     History=msg.payload
+#     # print("XXXX")
+#     client.disconnect()
+
+# def job():
+#     client = mqtt.Client()
+#     client.on_message = on_message
+#     client.connect(host="localhost", port=1883)
+#     client.subscribe('LOG', 0)
+#     # client.subscribe('mem', 0)
+#     try:
+#         client.loop_forever()
+#     except KeyboardInterrupt as e:
+#         pass    
 class Logging(APIView):
     permission_classes = (permissions.AllowAny,)
-    
+    history=[]
+
+    def __init__(self):
+        pass
+        # self.on_message=on_message(client, obj, msg):
+
     def get(self, request):
         import os
         import os.path as osp
@@ -67,6 +104,16 @@ class Logging(APIView):
         import fib_pb2
         import fib_pb2_grpc
 
+
+        # client = mqtt.Client()
+        # client.on_message = on_message
+        # client.connect(host="localhost", port=1883)
+        # client.subscribe('LOG', 0)
+        # # client.subscribe('mem', 0)
+        # try:
+        #     client.loop_forever()
+        # except KeyboardInterrupt as e:
+        #     pass    
         # order=int(request.data["order"])
         # host = f"{args['ip']}:{args['port']}"
         # print(host)
@@ -84,4 +131,5 @@ class Logging(APIView):
             response = MessageToDict(response, preserving_proto_field_name = True)
             desired_res = response["history"]
             history=[int(i) for i in desired_res]
-        return Response(data={ 'echo': history }, status=200)
+        # return Response(data={ 'echo': history }, status=200)
+        return Response(data={ 'history': history }, status=200)
