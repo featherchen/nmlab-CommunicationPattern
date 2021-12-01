@@ -14,6 +14,7 @@ git clone git@github.com:featherchen/nmlab-CommunicationPattern.git
 bash ./setting.sh
 cd gRPC-with-protobuf
 make
+cd ..
 ```
 
 ## Run servers
@@ -45,3 +46,7 @@ curl -X POST -H "Content-Type: application/json" http://127.0.0.1:8000/rest/fibo
 ```
 curl -X GET -H "Content-Type: application/json" http://127.0.0.1:8000/rest/logs/
 ```
+
+## Tutorial
+
+[Video](https://www.loom.com/share/c736703e4ed64ea3943ca3716bf37932)

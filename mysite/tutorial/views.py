@@ -87,6 +87,9 @@ class Logging(APIView):
             response = stub.Log(req)
 
             response = MessageToDict(response, preserving_proto_field_name = True)
-            desired_res = response["history"]
+            if "history" in response:
+                desired_res = response["history"]
+            else:
+                desired_res=[] 
             history=[int(i) for i in desired_res]
         return Response(data={ 'history': history }, status=200)
