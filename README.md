@@ -12,6 +12,8 @@ git clone git@github.com:featherchen/nmlab-CommunicationPattern.git
 
 ```
 bash ./setting.sh
+cd gRPC-with-protobuf
+make
 ```
 
 ## Run servers
